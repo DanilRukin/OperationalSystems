@@ -3,10 +3,11 @@ import uuid
 
 
 class Instruction:
-    def __init__(self, instruction_type, duration):
+    def __init__(self, instruction_type, duration, logger):
         self.__duration = duration
         self.__instructionType = instruction_type
         self.__id = uuid.uuid4()
+        self.__logger = logger
 
     @property
     def duration(self):
@@ -15,7 +16,9 @@ class Instruction:
     @duration.setter
     def duration(self, duration):
         if duration < 0:
-            raise Exception("Продолжительность выполнения инструкции не может быть меньше нуля")
+            message = "Продолжительность выполнения инструкции не может быть меньше нуля"
+            self._logger.error(message)
+            raise Exception(message)
         self.__duration = duration
 
     @property
@@ -26,7 +29,8 @@ class Instruction:
         timing = time.time()
         current_time = 0
         while current_time < self.__duration:
-            print(f"Выполняется инструкция ({self.__id}) с типом {self.__instructionType}. Время: {current_time}")
+            message = f"Выполняется инструкция ({self.__id}) с типом {self.__instructionType}. Время: {current_time}"
+            self.__logger.info(message)
             current_time = time.time() - timing
             
 
@@ -38,4 +42,4 @@ class InstructionType(Enum):
     IO = 2
 
     def __str__(self):
-        return str(self)
+        return str(self.name)

@@ -5,11 +5,12 @@ class Package:
     """
     Package - пакет заданий для выполнения в системе
     """
-    def __init__(self):
+    def __init__(self, logger):
         self.__instructions = []
         self.__status = PackageStatus.New
         self.__current_time = 0
         self.__id = uuid.uuid4()
+        self.__logger = logger
 
     def add_instruction(self, instruction):
         self.__instructions.append(instruction)
@@ -36,12 +37,14 @@ class Package:
         elif self.__status == PackageStatus.Interrupted:
             self.__continue()
         else:
-            raise Exception(f"Невозможно выполнить пакет {self.__id} со статусом {self.__status}")
+            message = f"Невозможно выполнить пакет {self.__id} со статусом {self.__status}"
+            self.__logger.error(message)
+            raise Exception(message)
         
 
 
     def __start(self):
-        print(f"Начинает выполняться пакет {self.__id}")
+        self.__logger.info(f"Начинает выполняться пакет {self.__id}")
         self.__status = PackageStatus.Executing
         self.__current_time = 0
         timing = time.time()
@@ -60,14 +63,14 @@ class Package:
                 current_instruction.execute()
                 self.__current_time = time.time() - timing
         else:
-            print(f"Пакет {self.__id} не был выполнен, т.к. не было инструкций")
+            self.__logger.info(f"Пакет {self.__id} не был выполнен, т.к. не было инструкций")
             return
-        print(f"Пакет {self.__id} выполнен полностью")
+        self.__logger.info(f"Пакет {self.__id} выполнен полностью")
         self.__status = PackageStatus.Completed
         return
 
     def __continue(self):
-        print(f"Продолжает выполняться пакет {self.__id}")
+        self.__logger.info(f"Продолжает выполняться пакет {self.__id}")
         self.__status = PackageStatus.Executing
         timing = time.time()
         local_time = 0
@@ -87,10 +90,10 @@ class Package:
                 current_instruction.execute()
                 local_time = time.time() - timing
         else:
-            print(f"Пакет {self.__id} не продолжил выполняться, т.к. не было инструкций")
+            self.__logger.info(f"Пакет {self.__id} не продолжил выполняться, т.к. не было инструкций")
             return
         self.__current_time += local_time
-        print(f"Пакет {self.__id} выполнен полностью")
+        self.__logger.info(f"Пакет {self.__id} выполнен полностью")
         self.__status = PackageStatus.Completed
         return
 
