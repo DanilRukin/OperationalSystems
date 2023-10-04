@@ -15,11 +15,11 @@ def get_instruction_type():
 def config_1(sys: sys):
     instructions_count = 10
     packages_count = 5
-    # instructions = [Instruction(lambda _: InstructionType.IO if random.randint(0, 100) % 2 == 0 else InstructionType.Process,
-    #                              random.randint(1, 10), sys.logger) for _ in range(instructions_count)]
-    instructions = []
-    for i in range(instructions_count):
-        instructions.append(Instruction(get_instruction_type(), random.randint(0, 10), sys.logger))
+    instructions = [Instruction((lambda _: InstructionType.IO if random.randint(0, 100) % 2 == 0 else InstructionType.Process)(_),
+                                 random.randint(1, 10), sys.logger) for _ in range(instructions_count)]
+    # instructions = []
+    # for i in range(instructions_count):
+    #     instructions.append(Instruction(get_instruction_type(), random.randint(0, 10), sys.logger))
     packages = [Package(sys.logger) for _ in range(packages_count)]
     #packages = list(map(lambda pack: (pack.add_instruction(instructions[i]) for i in range(random.randint(0, instructions_count))), packages))
     for i in range(packages_count):
