@@ -28,7 +28,7 @@ class Instruction:
     def execute(self):
         timing = time.time()
         current_time = 0
-        message = f"Выполняется инструкция ({self.__id}) с типом {self.__instructionType}. Время: {current_time}"
+        message = f"Выполняется инструкция ({self.__id}) с типом {self.__instructionType}."
         self.__logger.info(message)
         while current_time < self.__duration:                       
             current_time = time.time() - timing

@@ -11,12 +11,21 @@ class Package:
         self.__current_time = 0
         self.__id = uuid.uuid4()
         self.__logger = logger
+        self.__instructions_executed = 0
 
     def add_instruction(self, instruction):
         self.__instructions.append(instruction)
 
     def remove_instruction(self, instruction):
         self.__instructions.remove(instruction)
+
+    @property
+    def current_working_time(self):
+        return self.__current_time
+
+    @property
+    def instructions_executed(self):
+        return self.__instructions_executed
 
     @property
     def id(self):
@@ -27,7 +36,7 @@ class Package:
         return self.__status
 
     @property
-    def instruction(self):
+    def instructions(self):
         return self.__instructions
 
 
@@ -59,8 +68,10 @@ class Package:
                     self.__instructions.insert(0, current_instruction)
                     self.__status = PackageStatus.Interrupted
                     self.__current_time = time.time() - timing
+                    self.__logger.info(f"Пакет {self.__id} прервал выполнение")
                     return
                 current_instruction.execute()
+                self.__instructions_executed += 1
                 self.__current_time = time.time() - timing
         else:
             self.__logger.info(f"Пакет {self.__id} не был выполнен, т.к. не было инструкций")
@@ -86,8 +97,10 @@ class Package:
                     self.__status = PackageStatus.Interrupted
                     local_time = time.time() - timing
                     self.__current_time += local_time
+                    self.__logger.info(f"Пакет {self.__id} прервал выполнение")
                     return
                 current_instruction.execute()
+                self.__instructions_executed += 1
                 local_time = time.time() - timing
         else:
             self.__logger.info(f"Пакет {self.__id} не продолжил выполняться, т.к. не было инструкций")
@@ -96,10 +109,6 @@ class Package:
         self.__logger.info(f"Пакет {self.__id} выполнен полностью")
         self.__status = PackageStatus.Completed
         return
-
-
-
-    
 
 
 

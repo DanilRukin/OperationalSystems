@@ -17,15 +17,24 @@ def get_instruction_type():
         return InstructionType.Process
     else:
         return InstructionType.IO
+    
+def generate_time_for_instruction(instruction_type):
+    if instruction_type == InstructionType.Process:
+        return random.random()
+    elif instruction_type == InstructionType.IO:
+        return random.randint(1, 10)
+    else:
+        raise Exception(f"invalid instruction type: {instruction_type}")
 
 def random_config(sys: sys):
     instructions_count = 10
     packages_count = 5
-    instructions = [Instruction((lambda _: InstructionType.IO if random.randint(0, 100) % 2 == 0 else InstructionType.Process)(_),
-                                 random.randint(1, 10), sys.logger) for _ in range(instructions_count)]
-    # instructions = []
-    # for i in range(instructions_count):
-    #     instructions.append(Instruction(get_instruction_type(), random.randint(0, 10), sys.logger))
+
+    instructions = []
+    for i in range(instructions_count):
+        type = get_instruction_type()
+        instructions.append(Instruction(type, generate_time_for_instruction(type), sys.logger))
+
     packages = [Package(sys.logger) for _ in range(packages_count)]
     #packages = list(map(lambda pack: (pack.add_instruction(instructions[i]) for i in range(random.randint(0, instructions_count))), packages))
     for i in range(packages_count):
@@ -39,7 +48,8 @@ def random_config(sys: sys):
 def only_proccess_instructions_config(sys: sys):
     instructions_count = 5
     packages_count = 3
-    instructions = [Instruction(InstructionType.Process, random.randint(0, 10), sys.logger) for _ in range(instructions_count)]
+    instructions = [Instruction(InstructionType.Process, generate_time_for_instruction(InstructionType.Process),
+                                 sys.logger) for _ in range(instructions_count)]
     packages = [Package(sys.logger) for _ in range(packages_count)]
     for i in range(packages_count):
         num = random.randint(1, instructions_count)
@@ -52,7 +62,8 @@ def only_proccess_instructions_config(sys: sys):
 def only_io_instructions_config():
     instructions_count = 5
     packages_count = 3
-    instructions = [Instruction(InstructionType.IO, random.randint(0, 10), sys.logger) for _ in range(instructions_count)]
+    instructions = [Instruction(InstructionType.IO, generate_time_for_instruction(InstructionType.IO),
+                                 sys.logger) for _ in range(instructions_count)]
     packages = [Package(sys.logger) for _ in range(packages_count)]
     for i in range(packages_count):
         num = random.randint(1, instructions_count)
@@ -65,8 +76,10 @@ def only_io_instructions_config():
 def equal_count_of_io_and_process_instructions_in_package_config(sys: sys):
     instructions_count = 6
     packages_count = 3
-    instructions = [Instruction(InstructionType.IO, random.randint(0, 10), sys.logger) for _ in range(instructions_count // 2)]
-    instructions.extend([Instruction(InstructionType.Process, random.randint(0, 10), sys.logger) for _ in range(instructions_count // 2)])
+    instructions = [Instruction(InstructionType.IO, generate_time_for_instruction(InstructionType.IO),
+                                 sys.logger) for _ in range(instructions_count // 2)]
+    instructions.extend([Instruction(InstructionType.Process, generate_time_for_instruction(InstructionType.Process),
+                                      sys.logger) for _ in range(instructions_count // 2)])
     shuffle(instructions)
     packages = [Package(sys.logger) for _ in range(packages_count)]
     for i in range(packages_count):
