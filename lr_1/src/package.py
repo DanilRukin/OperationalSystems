@@ -12,12 +12,22 @@ class Package:
         self.__id = uuid.uuid4()
         self.__logger = logger
         self.__instructions_executed = 0
+        self.__last_session_instructions_executed = 0
+        self.__last_session_execution_time = 0
 
     def add_instruction(self, instruction):
         self.__instructions.append(instruction)
 
     def remove_instruction(self, instruction):
         self.__instructions.remove(instruction)
+
+    @property
+    def last_session_execution_time(self):
+        return self.__last_session_execution_time
+
+    @property
+    def last_session_instructions_executed(self):
+        return self.__last_session_instructions_executed
 
     @property
     def current_working_time(self):
@@ -53,6 +63,8 @@ class Package:
 
 
     def __start(self):
+        last_session_executed_tasks_count = 0
+        self.__last_session_execution_time = 0
         self.__logger.info(f"Начинает выполняться пакет {self.__id}")
         self.__status = PackageStatus.Executing
         self.__current_time = 0
@@ -68,19 +80,27 @@ class Package:
                     self.__instructions.insert(0, current_instruction)
                     self.__status = PackageStatus.Interrupted
                     self.__current_time = time.time() - timing
+                    self.__last_session_execution_time = self.__current_time
                     self.__logger.info(f"Пакет {self.__id} прервал выполнение")
+                    self.__last_session_instructions_executed = last_session_executed_tasks_count
                     return
                 current_instruction.execute()
+                last_session_executed_tasks_count += 1
                 self.__instructions_executed += 1
                 self.__current_time = time.time() - timing
+                self.__last_session_execution_time = self.__current_time
         else:
             self.__logger.info(f"Пакет {self.__id} не был выполнен, т.к. не было инструкций")
+            self.__last_session_instructions_executed = last_session_executed_tasks_count
             return
         self.__logger.info(f"Пакет {self.__id} выполнен полностью")
         self.__status = PackageStatus.Completed
+        self.__last_session_instructions_executed = last_session_executed_tasks_count
         return
 
     def __continue(self):
+        last_session_executed_tasks_count = 0
+        self.__last_session_execution_time = 0
         self.__logger.info(f"Продолжает выполняться пакет {self.__id}")
         self.__status = PackageStatus.Executing
         timing = time.time()
@@ -96,18 +116,24 @@ class Package:
                     self.__instructions.insert(0, current_instruction)
                     self.__status = PackageStatus.Interrupted
                     local_time = time.time() - timing
+                    self.__last_session_execution_time = local_time
                     self.__current_time += local_time
                     self.__logger.info(f"Пакет {self.__id} прервал выполнение")
+                    self.__last_session_instructions_executed = last_session_executed_tasks_count
                     return
                 current_instruction.execute()
+                last_session_executed_tasks_count += 1
                 self.__instructions_executed += 1
                 local_time = time.time() - timing
         else:
             self.__logger.info(f"Пакет {self.__id} не продолжил выполняться, т.к. не было инструкций")
+            self.__last_session_instructions_executed = last_session_executed_tasks_count
             return
+        self.__last_session_execution_time = local_time
         self.__current_time += local_time
         self.__logger.info(f"Пакет {self.__id} выполнен полностью")
         self.__status = PackageStatus.Completed
+        self.__last_session_instructions_executed = last_session_executed_tasks_count
         return
 
 
