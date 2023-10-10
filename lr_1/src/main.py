@@ -3,20 +3,14 @@ from packet_system import System
 import sys
 from matplotlib import pyplot as plt
 import logging
+from threading import Thread
 
 
-if __name__ == "__main__":
-    GlobalParams.io_instruction_max_working_time = 4
-    GlobalParams.io_instruction_min_working_time = 1
-    GlobalParams.random_config_instructions_count = 20
-    GlobalParams.random_config_packages_count = 7
-
-    sessions = []
-    sessions_count = input("Количество сессий: ")
-    sessions_count = int(sessions_count)
-
-    packet_os = System(get_logger())
-
+def run_sessions(packet_os, sessions_count, disable_logging, output_sessions):
+    if disable_logging:
+        logging.disable()
+    else:
+        logging.disable(logging.NOTSET)
     for session_index in range(sessions_count):     
         # variant = input("Выберете вариант конфигурации (random - 1, только Process - 2, только IO - 3, IO = Process 4): ")
         # variant = int(variant)
@@ -36,7 +30,7 @@ if __name__ == "__main__":
 
         productivity, working_time, processor_downtime = packet_os.start(40)
 
-        sessions.append((session_index, productivity, working_time, processor_downtime,
+        output_sessions.append((session_index, productivity, working_time, processor_downtime,
                           io_instructions_count, process_instructions_count))
 
         logger = packet_os.logger
@@ -48,6 +42,42 @@ if __name__ == "__main__":
         logger.info(f"Число задач с типом IO: {io_instructions_count} шт")
         logger.info(f"Число задач с типом Process: {process_instructions_count} шт")
         logger.info(f"======================= сессия {session_index + 1} (конец) ===============")
+    return
+
+
+if __name__ == "__main__":
+    GlobalParams.io_instruction_max_working_time = 4
+    GlobalParams.io_instruction_min_working_time = 1
+    GlobalParams.random_config_instructions_count = 20
+    GlobalParams.random_config_packages_count = 7
+
+    sessions = []
+    sessions_count = input("Количество сессий: ")
+    sessions_count = int(sessions_count)
+    if (sessions_count > 10):
+        threads_count = input("Укажите кол-во потоков: ")
+        threads_count = int(threads_count)
+        sessions_for_thread_count = sessions_count // threads_count
+        last_thread_sessions_count = sessions_count - (sessions_for_thread_count * threads_count)
+        #threads = [Thread(target=run_sessions, args=[System(get_logger()), sessions_for_thread_count, True]) for _ in range(threads_count)]
+        threads = []
+        output_sessions = [[] for _ in range(threads_count)]
+        for i in range(threads_count - 1):
+            t = Thread(target=run_sessions, args=[System(get_logger()), sessions_for_thread_count, True, output_sessions[i]])
+            threads.append(t)
+            t.start()
+        t = Thread(target=run_sessions, args=[System(get_logger()), last_thread_sessions_count, False, output_sessions[threads_count - 1]])
+        threads.append(t)
+        t.start()
+        for thread in threads:
+            thread.join()
+        for s in output_sessions:
+            sessions.extend(s)
+    else:
+        s = []
+        run_sessions(System(get_logger()), sessions_count, False, s)
+        sessions.extend(s)
+    
     
     logging.disable()
 
