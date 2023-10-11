@@ -63,14 +63,20 @@ if __name__ == "__main__":
         threads = []
         output_sessions = [[] for _ in range(threads_count)]
         for i in range(threads_count - 1):
+            print(f"Создаю поток {i + 1}")
             t = Thread(target=run_sessions, args=[System(get_logger()), sessions_for_thread_count, True, output_sessions[i]])
             threads.append(t)
             t.start()
-        t = Thread(target=run_sessions, args=[System(get_logger()), last_thread_sessions_count, False, output_sessions[threads_count - 1]])
+            print(f"Поток {i + 1} создан и запущен с {sessions_for_thread_count} сессиями")
+        print(f"Создаю поток {threads_count}")
+        t = Thread(target=run_sessions, args=[System(get_logger()), last_thread_sessions_count, True, output_sessions[threads_count - 1]])
         threads.append(t)
         t.start()
+        print(f"Поток {threads_count} создан и запущен с {last_thread_sessions_count} сессиями")
+        print("Ожидаю выполнение всех потоков")
         for thread in threads:
             thread.join()
+        print("Все потоки завершены, расчитываю результаты")
         for s in output_sessions:
             sessions.extend(s)
     else:

@@ -65,6 +65,7 @@ def generate_time_for_instruction(instruction_type):
 
 def random_config(sys: sys):
     instructions = []
+    sys.tasks.clear()
     for i in range(GlobalParams.random_config_instructions_count):
         type = get_instruction_type()
         instructions.append(Instruction(type, generate_time_for_instruction(type), sys.logger))
@@ -80,6 +81,7 @@ def random_config(sys: sys):
     return
 
 def only_proccess_instructions_config(sys: sys):
+    sys.tasks.clear()
     instructions_count = 5
     packages_count = 3
     instructions = [Instruction(InstructionType.Process, generate_time_for_instruction(InstructionType.Process),
@@ -93,7 +95,8 @@ def only_proccess_instructions_config(sys: sys):
         sys.add_task(packages[i]) 
     return
 
-def only_io_instructions_config():
+def only_io_instructions_config(sys: sys):
+    sys.tasks.clear()
     instructions_count = 5
     packages_count = 3
     instructions = [Instruction(InstructionType.IO, generate_time_for_instruction(InstructionType.IO),
@@ -108,6 +111,7 @@ def only_io_instructions_config():
     return
 
 def equal_count_of_io_and_process_instructions_in_package_config(sys: sys):
+    sys.tasks.clear()
     instructions_count = 6
     packages_count = 3
     instructions = [Instruction(InstructionType.IO, generate_time_for_instruction(InstructionType.IO),
