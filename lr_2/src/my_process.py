@@ -60,6 +60,12 @@ class Package:
             self.__logger.error(message)
             raise Exception(message)
         
+    def remaining_time(self):
+        result = 0
+        for inst in self.__instructions:
+            result += inst.duration
+        return result
+        
 
 
     def __start(self):
