@@ -2,11 +2,13 @@ from abc import ABC, abstractmethod
 from my_process import PackageStatus
 import uuid
 
+
 class ProcessQueue(ABC):
-    def __init__(self, priority):
+    def __init__(self, priority, logger):
         self.__processes = []
         self.__id = uuid.uuid4()
         self.__priority = priority
+        self.__logger = logger
         self.__can_execute = False
 
     @property
@@ -34,8 +36,8 @@ class ProcessQueue(ABC):
 
 class RobinRoundQueue(ProcessQueue):
 
-    def __init__(self, priority, quantum_of_time):
-        super().__init__(priority)
+    def __init__(self, priority, logger, quantum_of_time):
+        super().__init__(priority, logger)
         self.__quantum_of_time = quantum_of_time
 
     @property
@@ -67,3 +69,23 @@ class RobinRoundQueue(ProcessQueue):
                         pass
                     else:
                         self.__processes.append(process)
+
+
+
+class FcfsQueue(ProcessQueue):
+    def __init__(self, priority, logger):
+        super().__init__(priority, logger)
+
+    def manage_processes(self):
+        # Процессы выполняются друг за другом до тех пор, пока не выполнятся полностью
+        self.__logger.info(f'FCFS ({self.__id}): начало выполнения набора процессов...')
+        self.__can_execute = True
+        process
+        while self.__can_execute and self.__processes:
+            process = self.__processes.pop(0)
+            process.start()
+        pass
+
+
+    def __str__(self) -> str:
+        return f'Очередь ({self.__id}): алгоритм - FCFS'
