@@ -26,11 +26,18 @@ class ProcessQueue(ABC):
         self.__processes.remove(process)
 
     @abstractmethod
-    def manage_processes(self):
+    def manage_processes(self, sys):
+        pass
+
+    @abstractmethod
+    def could_add_process(self, process):
         pass
 
     def stop(self):
         self.__can_execute = False
+
+    def has_processes(self):
+        return True if self.__processes else False
 
 
 
@@ -53,10 +60,13 @@ class RobinRoundQueue(ProcessQueue):
 
     def __str__(self) -> str:
         return f'Очередь ({self.__id}): алгоритм - RobinRound'
+    
+    def could_add_process(self, process):
+        return True if process.remaining_time() <= self.__quantum_of_time else False
 
 
 
-    def manage_processes(self):
+    def manage_processes(self, sys):
         self.__can_execute = True
         while self.__can_execute:
             if self.__processes:
@@ -76,16 +86,20 @@ class FcfsQueue(ProcessQueue):
     def __init__(self, priority, logger):
         super().__init__(priority, logger)
 
-    def manage_processes(self):
+    def manage_processes(self, sys):
         # Процессы выполняются друг за другом до тех пор, пока не выполнятся полностью
         self.__logger.info(f'FCFS ({self.__id}): начало выполнения набора процессов...')
-        self.__can_execute = True
         process
-        while self.__can_execute and self.__processes:
+        while self.__processes:
             process = self.__processes.pop(0)
             process.start()
+            if sys.are_another_more_priority_queues_have_processes(self):
+                break
         pass
 
 
     def __str__(self) -> str:
         return f'Очередь ({self.__id}): алгоритм - FCFS'
+    
+    def could_add_process(self, process):
+        return True
