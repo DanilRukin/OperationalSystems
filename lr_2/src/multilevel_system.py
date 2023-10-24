@@ -2,6 +2,7 @@ from my_process import *
 from queue import *
 import uuid
 from datetime import datetime
+import events
 
 
 class MultilevelSystem:
@@ -10,6 +11,11 @@ class MultilevelSystem:
         self.__id = uuid.uuid4()
         self.__queues = []
         self.__processes = []
+        self.stop_system_event = events.Event()
+
+    def on_stop_system(self):
+        self.stop_system_event.invoke(self, None)
+
 
     def add_queue(self, queue):
         self.__queues.append(queue)
@@ -18,12 +24,22 @@ class MultilevelSystem:
     def remove_queue(self, queue):
         self.__queues.remove(queue)
 
-    def start(self):
+    def start(self, max_working_time):
         self.__logger.info(f'System started at: {datetime.now()}')
         self.__configure()
         self.__logger.info('Starting process the processes...')
-        for queue in self.__queues:
-            queue.manage_processes(self)
+        timing = time.time()
+        current_time = 0
+        exit = False
+        while current_time < max_working_time and not exit:
+            for queue in self.__queues:
+                if time.time() - timing > max_working_time:
+                    exit = True
+                    self.on_stop_system()
+                    break
+                else:
+                    queue.manage_processes(self)
+            current_time = time.time() - timing
         self.__logger.info('All processes have been processed')
         self.__logger.info(f'System stopped at: {datetime.now()}')
 
