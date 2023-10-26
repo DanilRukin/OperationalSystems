@@ -5,7 +5,7 @@ class Package:
     """
     Package - пакет заданий для выполнения в системе
     """
-    def __init__(self, logger):
+    def __init__(self, logger, queue):
         self.__instructions = []
         self.__status = PackageStatus.New
         self.__current_time = 0
@@ -14,6 +14,7 @@ class Package:
         self.__instructions_executed = 0
         self.__last_session_instructions_executed = 0
         self.__last_session_execution_time = 0
+
 
     def add_instruction(self, instruction):
         self.__instructions.append(instruction)
@@ -48,16 +49,9 @@ class Package:
     @property
     def instructions(self):
         return self.__instructions
-
-        
-    def remaining_time(self):
-        result = 0
-        for inst in self.__instructions:
-            result += inst.duration
-        return result
         
 
-    def start(self):
+    def execute(self, quant):
         if self.__status == PackageStatus.New:
             self.__logger.info(f"Выполняется пакет {self.__id}")
         elif self.__status == PackageStatus.Interrupted:
@@ -70,32 +64,24 @@ class Package:
         last_session_executed_tasks_count = 0
         self.__last_session_execution_time = 0
         self.__last_session_instructions_executed = 0
-        self.__can_execute = True      
         local_time = 0        
         timing = time.time()       
-        while self.__can_execute and self.__instructions: # исполняемся до тех пор пока кто-нибудь не вызовет метод stop, либо до конца пакета инструкций
+        while local_time < quant and self.__instructions: # исполняемся в пределах кванта времени
             instruction = self.__instructions.pop(0)
             instruction.execute()
             self.__instructions_executed += 1
             last_session_executed_tasks_count += 1
-        if self.__instructions: # если вызвали метод stop и есть еще инструкции
+            local_time = time.time() - timing
+        if self.__instructions: # если истек квант времени
             self.__status = PackageStatus.Interrupted
             self.__logger.info(f"Пакет {self.__id} прервал выполнение")
         else: # закончились инструкции
-            self.__can_execute = False
             self.__status = PackageStatus.Completed
-            self.__logger.info(f"Пакет {self.__id} выполнен полностью")
-        local_time = time.time() - timing
+            self.__logger.info(f"Пакет {self.__id} выполнен полностью")      
         self.__current_time += local_time
         self.__last_session_execution_time = local_time
         self.__last_session_instructions_executed = last_session_executed_tasks_count
         return
-
-
-
-    def stop(self):
-        self.__can_execute = False
-
 
 
 
