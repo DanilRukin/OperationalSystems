@@ -1,12 +1,11 @@
 from configs import *
 from time_sharing_system import TimeSharingSystem
-import sys
 from matplotlib import pyplot as plt
 import logging
 from threading import Thread
 
 
-def run_sessions(packet_os, sessions_count, disable_logging, output_sessions):
+def run_sessions(time_sharing_os, sessions_count, disable_logging, output_sessions):
     if disable_logging:
         logging.disable()
     else:
@@ -16,26 +15,26 @@ def run_sessions(packet_os, sessions_count, disable_logging, output_sessions):
         # variant = int(variant)
         variant = 1
         if variant == 1:
-            packet_os.configure(random_config)
+            time_sharing_os.configure(random_config)
         elif variant == 2:
-            packet_os.configure(only_proccess_instructions_config)
+            time_sharing_os.configure(only_proccess_instructions_config)
         elif variant == 3:
-            packet_os.configure(only_io_instructions_config)
+            time_sharing_os.configure(only_io_instructions_config)
         elif variant == 4:
-            packet_os.configure(equal_count_of_io_and_process_instructions_in_package_config)
+            time_sharing_os.configure(equal_count_of_io_and_process_instructions_in_package_config)
 
         # число инструкций надо посчитать до старта системы, т.к. пакеты по мере выполнения выкидываются
-        io_instructions_count = packet_os.get_count_of_IO_instructions()
-        process_instructions_count = packet_os.get_count_of_Process_instructions()
+        io_instructions_count = time_sharing_os.get_count_of_IO_instructions()
+        process_instructions_count = time_sharing_os.get_count_of_Process_instructions()
 
-        productivity, working_time, processor_downtime = packet_os.start(40)
+        productivity, working_time, processor_downtime = time_sharing_os.start(40, GlobalParams.quantum_of_time)
 
         output_sessions.append((session_index, productivity, working_time, processor_downtime,
                           io_instructions_count, process_instructions_count))
 
-        logger = packet_os.logger
+        logger = time_sharing_os.logger
         logger.info(f"======================= сессия {session_index + 1} =======================")
-        logger.info(f"Время работы системы: {packet_os.last_session_work_time} с")
+        logger.info(f"Время работы системы: {time_sharing_os.last_session_work_time} с")
         logger.info(f"Производительность: {productivity}")
         logger.info(f"Оборотное время: {working_time} с")
         logger.info(f"Время простоя процессора: {processor_downtime} с")
@@ -50,6 +49,7 @@ if __name__ == "__main__":
     GlobalParams.io_instruction_min_working_time = 1
     GlobalParams.random_config_instructions_count = 20
     GlobalParams.random_config_packages_count = 7
+    GlobalParams.quantum_of_time = 3
 
     sessions = []
     sessions_count = input("Количество сессий: ")
@@ -64,12 +64,12 @@ if __name__ == "__main__":
         output_sessions = [[] for _ in range(threads_count)]
         for i in range(threads_count - 1):
             print(f"Создаю поток {i + 1}")
-            t = Thread(target=run_sessions, args=[System(get_logger()), sessions_for_thread_count, True, output_sessions[i]])
+            t = Thread(target=run_sessions, args=[TimeSharingSystem(get_logger()), sessions_for_thread_count, True, output_sessions[i]])
             threads.append(t)
             t.start()
             print(f"Поток {i + 1} создан и запущен с {sessions_for_thread_count} сессиями")
         print(f"Создаю поток {threads_count}")
-        t = Thread(target=run_sessions, args=[System(get_logger()), last_thread_sessions_count, True, output_sessions[threads_count - 1]])
+        t = Thread(target=run_sessions, args=[TimeSharingSystem(get_logger()), last_thread_sessions_count, True, output_sessions[threads_count - 1]])
         threads.append(t)
         t.start()
         print(f"Поток {threads_count} создан и запущен с {last_thread_sessions_count} сессиями")
@@ -81,7 +81,7 @@ if __name__ == "__main__":
             sessions.extend(s)
     else:
         s = []
-        run_sessions(System(get_logger()), sessions_count, False, s)
+        run_sessions(TimeSharingSystem(get_logger()), sessions_count, False, s)
         sessions.extend(s)
     
     

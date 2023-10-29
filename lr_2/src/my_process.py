@@ -5,7 +5,7 @@ class Package:
     """
     Package - пакет заданий для выполнения в системе
     """
-    def __init__(self, logger, queue):
+    def __init__(self, logger):
         self.__instructions = []
         self.__status = PackageStatus.New
         self.__current_time = 0
