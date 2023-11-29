@@ -4,14 +4,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Messanger.Client.Infrastructure.Views
+namespace Messanger.Client.Presentation.Views
 {
     /// <summary>
     /// Выбор собеседника
     /// </summary>
     public class SelectInterlocutorView : IView
     {
-        public void Show()
+        public bool Show()
         {
             throw new NotImplementedException();
         }

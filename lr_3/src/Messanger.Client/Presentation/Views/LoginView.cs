@@ -4,11 +4,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Messanger.Client.Infrastructure.Views
+namespace Messanger.Client.Presentation.Views
 {
-    public class ChatView : IView
+    public class LoginView : IView
     {
-        public void Show()
+
+        public bool Show()
         {
             throw new NotImplementedException();
         }

@@ -1,11 +1,11 @@
-﻿using Messanger.Client.Infrastructure.Views;
+﻿using Messanger.Client.Presentation.Views;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Messanger.Client.Infrastructure
+namespace Messanger.Client.Presentation
 {
     public class Presenter
     {
