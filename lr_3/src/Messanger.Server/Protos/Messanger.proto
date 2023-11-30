@@ -5,6 +5,7 @@ option csharp_namespace = "Messanger.Server";
 
 service Messanger{
     rpc SendMessage (MessageRequest) returns (Sended);
+    rpc Login (LoginMessage) returns (UserToken);
 }
 
 message MessageRequest{
@@ -15,4 +16,12 @@ message MessageRequest{
 
 message Sended{
     bool sended = 1;
+}
+
+message LoginMessage{
+    string login = 1;
+    string password = 2;
+}
+message UserToken{
+    string token = 1;
 }
