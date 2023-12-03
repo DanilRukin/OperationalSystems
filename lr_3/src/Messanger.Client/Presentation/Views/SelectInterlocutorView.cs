@@ -1,4 +1,8 @@
-﻿using System;
+﻿using Grpc.Net.Client;
+using Messanger.Client.Data;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -22,19 +26,43 @@ namespace Messanger.Client.Presentation.Views
 
         public bool Show()
         {
-            ConsoleKey key;
-            do
+            IConfiguration config = _services.GetRequiredService<IConfiguration>();
+            while (true)
             {
                 Console.Clear();
                 Console.WriteLine("Введите номер друга, с которым хотите пообщаться," +
-                    "либо нажмите ESC для выхода");
-                key = Console.ReadKey(true).Key;
-                if (key != ConsoleKey.Escape)
-                {
+                    "либо введите ESC для выхода");
 
+                using (var channel = GrpcChannel.ForAddress(config["ServerAddress"]))
+                {
+                    var client = new Messanger.MessangerClient(channel);
+                    var getFriendsRequest = new UserId() { Id = Cash.UserId.ToString() };
+                    var friends = client.GetFriendsList(getFriendsRequest);
+                    if (friends != null && friends.Users != null)
+                    {
+                        int friendNumber = 1;
+                        foreach (var friend in friends.Users)
+                        {
+                            Console.WriteLine($"{friendNumber}. {friend.FirstName} {friend.LastName} {friend.Patronymic}");
+                        }
+                    }
+                    string? command = Console.ReadLine();
+                    if (command?.ToLower() == "esc")
+                    {
+                        _presenter.SetView(_services.GetRequiredService<MainView>());
+                        return true;
+                    }    
+                    if (int.TryParse(command, out int number))
+                    {
+                        if (number > 0 && number <= friends.Users.Count)
+                        {
+                            _presenter.SetView(_services.GetRequiredService<ChatView>());
+                            Cash.CurrentInterlocutor = Guid.Parse(friends.Users[number - 1].Id);
+                            return true;
+                        }
+                    }
                 }
-            } while (key != ConsoleKey.Escape);
-            return true;
+            }
         }
     }
 }

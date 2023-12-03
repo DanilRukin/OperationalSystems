@@ -5,7 +5,9 @@ option csharp_namespace = "Messanger.Server";
 
 service Messanger{
     rpc SendMessage (MessageRequest) returns (Sended);
-    rpc Login (LoginMessage) returns (UserToken);
+    rpc Login (LoginMessage) returns (LoginResponse);
+    rpc GetFriendsList (UserId) returns (ListUsers);
+    rpc GetUser(UserId) returns (UserData);
 }
 
 message MessageRequest{
@@ -15,13 +17,29 @@ message MessageRequest{
 }
 
 message Sended{
-    bool sended = 1;
+    bool success = 1;
 }
 
 message LoginMessage{
     string login = 1;
     string password = 2;
 }
-message UserToken{
-    string token = 1;
+message LoginResponse{
+    bool success = 1;
+    string userId = 2;
+}
+
+message UserData{
+    string id = 1;
+    string first_name = 2;
+    string last_name = 3;
+    string patronymic = 4;
+}
+
+message UserId{
+    string id = 1;
+}
+
+message ListUsers{
+    repeated UserData users = 1;
 }

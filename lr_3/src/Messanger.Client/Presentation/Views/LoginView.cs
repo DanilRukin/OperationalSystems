@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Messanger.Client;
 using Microsoft.Extensions.DependencyInjection;
+using Messanger.Client.Data;
 
 namespace Messanger.Client.Presentation.Views
 {
@@ -40,9 +41,10 @@ namespace Messanger.Client.Presentation.Views
                     var client = new Messanger.MessangerClient(channel);
                     var loginRequest = new LoginMessage() { Login = login, Password = password };
                     var token = client.Login(loginRequest);
-                    if (Guid.Empty == Guid.Parse(token.Token))
+                    if (Guid.TryParse(token.UserId, out Guid userId))
                     {
                         _presenter.SetView(_services.GetRequiredService<MainView>());
+                        Cash.UserId = userId;
                         return true;
                     }
                 }
