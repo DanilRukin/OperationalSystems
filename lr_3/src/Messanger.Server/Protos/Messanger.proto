@@ -8,6 +8,7 @@ service Messanger{
     rpc Login (LoginMessage) returns (LoginResponse);
     rpc GetFriendsList (UserId) returns (ListUsers);
     rpc GetUser(UserId) returns (UserData);
+    rpc GetAllUsers(Empty) returns (ListUsers);
 }
 
 message MessageRequest{
@@ -42,4 +43,8 @@ message UserId{
 
 message ListUsers{
     repeated UserData users = 1;
+}
+
+message Empty{
+
 }

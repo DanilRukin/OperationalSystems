@@ -18,5 +18,25 @@ namespace Messanger.Server.Services
                 $"and will be sended to {request.DestinationAddress}");
             return base.SendMessage(request, context);
         }
+
+        public override Task<ListUsers> GetAllUsers(Empty request, ServerCallContext context)
+        {
+            return base.GetAllUsers(request, context);
+        }
+
+        public override Task<ListUsers> GetFriendsList(UserId request, ServerCallContext context)
+        {
+            return base.GetFriendsList(request, context);
+        }
+
+        public override Task<UserData> GetUser(UserId request, ServerCallContext context)
+        {
+            return base.GetUser(request, context);
+        }
+
+        public override Task<LoginResponse> Login(LoginMessage request, ServerCallContext context)
+        {
+            return base.Login(request, context);
+        }
     }
 }
