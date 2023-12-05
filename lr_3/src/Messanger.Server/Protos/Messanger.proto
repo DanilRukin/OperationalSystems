@@ -9,6 +9,7 @@ service Messanger{
     rpc GetFriendsList (UserId) returns (ListUsers);
     rpc GetUser(UserId) returns (UserData);
     rpc GetAllUsers(Empty) returns (ListUsers);
+    rpc Subscribe(SubscribeMessage) returns (Empty);
 }
 
 message MessageRequest{
@@ -47,4 +48,9 @@ message ListUsers{
 
 message Empty{
 
+}
+
+message SubscribeMessage{
+    UserId Subscriber = 1;
+    UserId Subcribed = 2;
 }

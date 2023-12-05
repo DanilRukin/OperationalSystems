@@ -5,11 +5,23 @@ namespace Messanger.Server.Services
 {
     public class MessangerService : Messanger.MessangerBase
     {
-        private ILogger<MessangerService> _logger;
+        private readonly ILogger<MessangerService> _logger;
+        private readonly LoginService _loginService;
+        private readonly FriendService _friendService;
+        private readonly SendMessageService _sendMessageService;
+        private readonly CommonOperationsService _commonOperationsService;
 
-        public MessangerService(ILogger<MessangerService> logger)
+        public MessangerService(ILogger<MessangerService> logger,
+            SendMessageService sendMessageService,
+            CommonOperationsService commonOperationsService,
+            LoginService loginService,
+            FriendService friendService)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _sendMessageService = sendMessageService ?? throw new ArgumentNullException(nameof(sendMessageService));
+            _commonOperationsService = commonOperationsService ?? throw new ArgumentNullException(nameof(commonOperationsService));
+            _loginService = loginService ?? throw new ArgumentNullException(nameof(loginService));
+            _friendService = friendService ?? throw new ArgumentNullException(nameof(friendService));
         }
 
         public override Task<Sended> SendMessage(MessageRequest request, ServerCallContext context)
@@ -21,7 +33,14 @@ namespace Messanger.Server.Services
 
         public override Task<ListUsers> GetAllUsers(Empty request, ServerCallContext context)
         {
-            return base.GetAllUsers(request, context);
+            try
+            {
+
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.Message);
+            }
         }
 
         public override Task<ListUsers> GetFriendsList(UserId request, ServerCallContext context)
@@ -37,6 +56,11 @@ namespace Messanger.Server.Services
         public override Task<LoginResponse> Login(LoginMessage request, ServerCallContext context)
         {
             return base.Login(request, context);
+        }
+
+        public override Task<Empty> Subscribe(SubscribeMessage request, ServerCallContext context)
+        {
+            return base.Subscribe(request, context);
         }
     }
 }
