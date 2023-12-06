@@ -35,11 +35,12 @@ namespace Messanger.Server.Services
         {
             try
             {
-
+                return null;
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex.Message);
+                return null;
             }
         }
 
