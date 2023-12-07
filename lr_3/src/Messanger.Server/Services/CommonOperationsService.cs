@@ -49,5 +49,8 @@ namespace Messanger.Server.Services
                 return new List<User>();
             }
         }
+
+        public async Task<User?> GetUserById(Guid id) => 
+            await _dataContext.Users.FirstOrDefaultAsync(u => u.Id == id);
     }
 }

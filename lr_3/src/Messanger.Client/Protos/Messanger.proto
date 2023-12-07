@@ -10,6 +10,7 @@ service Messanger{
     rpc GetUser(UserId) returns (UserData);
     rpc GetAllUsers(Empty) returns (ListUsers);
     rpc Subscribe(SubscribeMessage) returns (Empty);
+    rpc FetchMessages(FetchMessageRequest) returns (FetchMessageResponse); 
 }
 
 message MessageRequest{
@@ -53,4 +54,13 @@ message Empty{
 message SubscribeMessage{
     UserId Subscriber = 1;
     UserId Subcribed = 2;
+}
+
+message FetchMessageRequest{
+    string sender_id = 1;
+    string reciever_id = 2;
+}
+
+message FetchMessageResponse{
+    repeated string messages = 1;
 }
