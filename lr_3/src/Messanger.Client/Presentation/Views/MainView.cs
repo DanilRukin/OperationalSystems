@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using Messanger.Client.Presentation.ViewsSettings;
+using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -22,12 +23,17 @@ namespace Messanger.Client.Presentation.Views
         {
             bool continueShow = false;
             ConsoleKey key;
+            ConsoleColor textColor = Console.ForegroundColor;
+            ConsoleColor backgroundColor = Console.BackgroundColor;
+            Console.BackgroundColor = MainViewSettings.BackgroundColor;
             do
             {
                 Console.Clear();
+                Console.ForegroundColor = MainViewSettings.TextColor;
                 Console.WriteLine("F1 - Найти друга");
                 Console.WriteLine("F2 - К списку чатов");
                 Console.WriteLine("ESC - Выйти");
+                Console.ForegroundColor = MainViewSettings.UserInputColor;
                 key = Console.ReadKey(true).Key;
                 switch (key)
                 {
@@ -47,6 +53,8 @@ namespace Messanger.Client.Presentation.Views
                         break;
                 }
             } while (key != ConsoleKey.Escape);
+            Console.ForegroundColor = textColor;
+            Console.BackgroundColor = backgroundColor;
             return continueShow;
         }
     }

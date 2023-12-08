@@ -1,5 +1,6 @@
 ﻿using Grpc.Net.Client;
 using Messanger.Client.Data;
+using Messanger.Client.Presentation.ViewsSettings;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System;
@@ -26,19 +27,26 @@ namespace Messanger.Client.Presentation.Views
             Console.Clear();
             IConfiguration config = _services.GetRequiredService<IConfiguration>();
             UserData userData;
+            ConsoleColor textColor = Console.ForegroundColor;
+            ConsoleColor backgroundColor = Console.BackgroundColor;
+            Console.BackgroundColor = ChatViewSettings.BackgroundColor;
             using (var channel = GrpcChannel.ForAddress(config["ServerAddress"]))
             {
                 var client = new Messanger.MessangerClient(channel);
                 userData = client.GetUser(new UserId() { Id = Cash.CurrentInterlocutor.ToString() });
                 if (userData == null)
                 {
+                    Console.ForegroundColor = ChatViewSettings.ErrorsMessagesColor;
                     Console.WriteLine("Не удалось получить собеседника...Нажмите любую клавишу, чтобы вернуться к списку чатов");
                     Console.ReadKey(true);
+                    Console.ForegroundColor = textColor;
+                    Console.BackgroundColor = backgroundColor;
                     _presenter.SetView(_services.GetRequiredService<SelectInterlocutorView>());
                     return true;
                 }
             }
             string message;
+            Console.ForegroundColor = ChatViewSettings.TextColor;
             Console.WriteLine($"Чат с пользователем {userData.FirstName} {userData.LastName} {userData.Patronymic}");
             using (var channel = GrpcChannel.ForAddress(config["ServerAddress"]))
             {
@@ -46,11 +54,15 @@ namespace Messanger.Client.Presentation.Views
                 while (true)
                 {
                     Console.Write("Ваше сообщение (esc для выхода): ");
+                    Console.ForegroundColor = ChatViewSettings.UserInputColor;
                     message = Console.ReadLine() ?? "";
+                    Console.ForegroundColor = ChatViewSettings.TextColor;
                     if (message.ToLower() == "esc")
                     {
                         _presenter.SetView(_services.GetRequiredService<SelectInterlocutorView>());
                         Cash.CurrentInterlocutor = Guid.Empty;
+                        Console.ForegroundColor = textColor;
+                        Console.BackgroundColor = backgroundColor;
                         return true;
                     }
                     bool result = client.SendMessage(new MessageRequest() 
@@ -61,10 +73,18 @@ namespace Messanger.Client.Presentation.Views
                     }).Success;
                     if (!result)
                     {
-                        ConsoleColor color = Console.ForegroundColor;
-                        Console.ForegroundColor = ConsoleColor.Red;
+                        Console.ForegroundColor = ChatViewSettings.ErrorsMessagesColor;
                         Console.WriteLine("Не удалось отправить сообщение...");
-                        Console.ForegroundColor = color;
+                        Console.ForegroundColor = ChatViewSettings.TextColor;
+                    }
+                    var fetchResponse = client.FetchMessages(new FetchMessageRequest()
+                    {
+                        RecieverId = Cash.UserId.ToString(),
+                        SenderId = Cash.CurrentInterlocutor.ToString() 
+                    });
+                    foreach (var fetchedMessage in fetchResponse.Messages)
+                    {
+                        Console.WriteLine(fetchedMessage);
                     }
                 }
             }

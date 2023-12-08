@@ -1,5 +1,6 @@
 ﻿using Grpc.Net.Client;
 using Messanger.Client.Data;
+using Messanger.Client.Presentation.ViewsSettings;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System;
@@ -27,9 +28,13 @@ namespace Messanger.Client.Presentation.Views
         public bool Show()
         {
             IConfiguration config = _services.GetRequiredService<IConfiguration>();
+            ConsoleColor textColor = Console.ForegroundColor;
+            ConsoleColor backgroundColor = Console.BackgroundColor;
+            Console.BackgroundColor = SelectInterlocutorViewSettings.BackgroundColor;
             while (true)
             {
                 Console.Clear();
+                Console.ForegroundColor = SelectInterlocutorViewSettings.TextColor;
                 Console.WriteLine("Введите номер друга, с которым хотите пообщаться," +
                     "либо введите ESC для выхода");
 
@@ -46,10 +51,13 @@ namespace Messanger.Client.Presentation.Views
                             Console.WriteLine($"{friendNumber}. {friend.FirstName} {friend.LastName} {friend.Patronymic}");
                         }
                     }
+                    Console.ForegroundColor = SelectInterlocutorViewSettings.UserInputColor;
                     string? command = Console.ReadLine();
                     if (command?.ToLower() == "esc")
                     {
                         _presenter.SetView(_services.GetRequiredService<MainView>());
+                        Console.BackgroundColor = backgroundColor;
+                        Console.ForegroundColor = textColor;
                         return true;
                     }    
                     if (int.TryParse(command, out int number))
@@ -58,6 +66,8 @@ namespace Messanger.Client.Presentation.Views
                         {
                             _presenter.SetView(_services.GetRequiredService<ChatView>());
                             Cash.CurrentInterlocutor = Guid.Parse(friends.Users[number - 1].Id);
+                            Console.BackgroundColor = backgroundColor;
+                            Console.ForegroundColor = textColor;
                             return true;
                         }
                     }

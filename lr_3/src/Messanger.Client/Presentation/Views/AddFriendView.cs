@@ -1,6 +1,7 @@
 ﻿using Google.Protobuf.Collections;
 using Grpc.Net.Client;
 using Messanger.Client.Data;
+using Messanger.Client.Presentation.ViewsSettings;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System;
@@ -26,12 +27,16 @@ namespace Messanger.Client.Presentation.Views
         public bool Show()
         {
             IConfiguration config = _services.GetRequiredService<IConfiguration>();
+            ConsoleColor textColor = Console.ForegroundColor;
+            ConsoleColor backgroundColor = Console.BackgroundColor;
+            Console.BackgroundColor = AddFriendViewSettings.BackgroundColor;
             using (var channel = GrpcChannel.ForAddress(config["ServerAddress"]))
             {
                 var client = new Messanger.MessangerClient(channel);
                 var empty = new Empty();
                 while (true)
                 {
+                    Console.ForegroundColor = AddFriendViewSettings.TextColor;
                     Console.Clear();
                     Console.WriteLine("Введите номер человека, с которым хотите подружиться," +
                         "либо введите ESC для выхода");
@@ -47,11 +52,13 @@ namespace Messanger.Client.Presentation.Views
                             Console.WriteLine($"{friendNumber}. {friend.FirstName} {friend.LastName} {friend.Patronymic}");
                         }
                     }
-
+                    Console.ForegroundColor = AddFriendViewSettings.UserInputColor;
                     string? command = Console.ReadLine();
                     if (command?.ToLower() == "esc")
                     {
                         _presenter.SetView(_services.GetRequiredService<MainView>());
+                        Console.ForegroundColor = textColor;
+                        Console.BackgroundColor = backgroundColor;
                         return true;
                     }
                     if (int.TryParse(command, out int number))
@@ -59,9 +66,12 @@ namespace Messanger.Client.Presentation.Views
                         if (number > 0 && number <= uniqueUsers?.Count)
                         {
                             var selectedUser = uniqueUsers[number - 1];
+                            Console.ForegroundColor = AddFriendViewSettings.TextColor;
                             Console.WriteLine($"Вы отправили заявку человеку: '{selectedUser.FirstName} {selectedUser.LastName} {selectedUser.Patronymic}'." +
                                 $" Для продолжения нажмите что-нибудь...");
                             _presenter.SetView(_services.GetRequiredService<MainView>());
+                            Console.ForegroundColor = textColor;
+                            Console.BackgroundColor = backgroundColor;
                             return true;
                         }
                     }
