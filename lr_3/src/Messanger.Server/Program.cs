@@ -1,14 +1,21 @@
 using Messanger.Server.Data;
+using Messanger.Server.Data.DataProfiles.Base;
+using Messanger.Server.Data.Services;
 using Messanger.Server.Services;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 
 var builder = WebApplication.CreateBuilder(args);
 IConfiguration config = builder.Configuration;
 
 // Add services to the container.
 builder.Services.AddGrpc();
-builder.Services.AddDbContext<MessangerDataContext>(optionsBuilder =>
-    optionsBuilder.UseNpgsql(config.GetConnectionString("Messanger_test"), sql => sql.MigrationsAssembly("Messanger.Server")));
+IDataProfileFactory dataProfileFactory = new DataProfileFactory(config);
+DataProfile dataProfile = dataProfileFactory.CreateProfile();
+// Add services to the container.
+
+builder.Services
+    .AddDbContext<MessangerDataContext>(dataProfile.ConfigureDbContextOptionsBuilder);
 
 var app = builder.Build();
 
