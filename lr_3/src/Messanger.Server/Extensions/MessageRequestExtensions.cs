@@ -12,7 +12,8 @@ namespace Messanger.Server.Extensions
                 RecieverId = Guid.Parse(messageRequest.SourceAddress),
                 SenderId = Guid.Parse(messageRequest.DestinationAddress),
                 Text = messageRequest.Message,
-                WasSended = false
+                WasSended = false,
+                DateSended = DateTime.UtcNow
             };
         }
     }

@@ -21,13 +21,13 @@ namespace Messanger.Server.Services
             {
                 _logger.LogInformation($"Вытягивание сообщений для пользователя " +
                     $"'{toUser.Id}' от пользователя '{fromUser.Id}'");
-                List<string> messages = await _dataContext
+                List<Message> messages = await _dataContext
                     ?.Messages
                     ?.Where(m =>
                         m.RecieverId == toUser.Id
                         && m.SenderId == fromUser.Id
                         && m.WasSended == false)
-                    ?.Select(m => m.Text)
+                    ?.OrderBy(m => m.DateSended)
                     ?.ToListAsync();
                 if (messages == null)
                 {
@@ -35,7 +35,9 @@ namespace Messanger.Server.Services
                     return new List<string>();
                 }
                 _logger.LogInformation($"Найдено сообщений: {messages.Count}");
-                return messages;
+                messages.ForEach(m => _dataContext.Messages.First(ms => ms.Id == m.Id).WasSended = true);
+                await _dataContext.SaveChangesAsync();
+                return messages.Select(m => m.Text);
             }
             catch(Exception ex)
             {

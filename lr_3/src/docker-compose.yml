@@ -1,0 +1,73 @@
+version: '3'
+services:
+  server:
+    build:
+      context: .
+      dockerfile: /Messanger.Server/Dockerfile
+    image: messanger-server
+    container_name: messanger-server
+    logging:
+      driver: "json-file"
+      options: 
+        max-size: "10m"
+        max-file: "3"
+    ports:
+      - "8080:80"
+    deploy:
+      resources:
+        limits:
+          cpus: '0.50'
+          memory: 200M
+          pids: 1
+        reservations:
+          cpus: '0.25'
+          memory: 100M
+    restart: always
+
+  client_1:
+    build:
+      context: .
+      dockerfile: /Messanger.Client/Dockerfile
+    image: messanger-client
+    container_name: messanger-client_1
+    logging:
+      driver: "json-file"
+      options: 
+        max-size: "10m"
+        max-file: "3"
+    ports:
+      - "8081:80"
+    deploy:
+      resources:
+        limits:
+          cpus: '0.50'
+          memory: 200M
+          pids: 1
+        reservations:
+          cpus: '0.25'
+          memory: 100M
+    restart: always
+
+  client_2:
+    build:
+      context: .
+      dockerfile: /Messanger.Client/Dockerfile
+    image: messanger-client
+    container_name: messanger-client_2
+    logging:
+      driver: "json-file"
+      options: 
+        max-size: "10m"
+        max-file: "3"
+    ports:
+      - "8082:80"
+    deploy:
+      resources:
+        limits:
+          cpus: '0.50'
+          memory: 200M
+          pids: 1
+        reservations:
+          cpus: '0.25'
+          memory: 100M
+    restart: always

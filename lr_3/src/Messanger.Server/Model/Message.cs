@@ -9,5 +9,6 @@
         public User Sender { get; set; }
         public Guid SenderId { get; set; }
         public bool WasSended { get; set; }
+        public DateTime DateSended { get; set; }
     }
 }

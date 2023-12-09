@@ -85,7 +85,7 @@ namespace Messanger.Client.Presentation.Views
                     Console.ForegroundColor = ChatViewSettings.MessagesFromFriendColor;
                     foreach (var fetchedMessage in fetchResponse.Messages)
                     {
-                        Console.WriteLine("\t\t" + fetchedMessage);
+                        Console.WriteLine("\t\t" + fetchedMessage + $" (от {userData.FirstName} {userData.LastName} {userData.Patronymic})");
                     }
                     Console.ForegroundColor = ChatViewSettings.TextColor;
                 }
