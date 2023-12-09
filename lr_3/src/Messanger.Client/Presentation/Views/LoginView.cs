@@ -33,11 +33,12 @@ namespace Messanger.Client.Presentation.Views
             ConsoleColor textColor = Console.ForegroundColor;
             ConsoleColor backgroundColor = Console.BackgroundColor;
             Console.BackgroundColor = LoginViewSettings.BackgroundColor;
+            int loginAttempt = 1;
             do
             {
                 Console.Clear();
                 Console.ForegroundColor = LoginViewSettings.TextColor;
-                Console.WriteLine($"Попытка залогиниться #{numberOfAttempts}");
+                Console.WriteLine($"Попытка залогиниться #{loginAttempt}");
                 Console.Write("\tИмя пользователя: ");
                 Console.ForegroundColor = LoginViewSettings.UserInputColor;
                 login = Console.ReadLine() ?? string.Empty;
@@ -52,16 +53,24 @@ namespace Messanger.Client.Presentation.Views
                     var token = client.Login(loginRequest);
                     if (Guid.TryParse(token.UserId, out Guid userId))
                     {
-                        _presenter.SetView(_services.GetRequiredService<MainView>());
-                        Cash.UserId = userId;
-                        Console.ForegroundColor = textColor;
-                        Console.BackgroundColor = backgroundColor;
-                        return true;
+                        if (userId != Guid.Empty)
+                        {
+                            _presenter.SetView(_services.GetRequiredService<MainView>());
+                            Cash.UserId = userId;
+                            Console.ForegroundColor = textColor;
+                            Console.BackgroundColor = backgroundColor;
+                            return true;
+                        } 
                     }
+                    Console.ForegroundColor = LoginViewSettings.InformationMessagesColor;
+                    Console.WriteLine("Неверный логин или пароль. Попробуйте еще раз. Нажмите любую клавишу...");
+                    Console.ReadKey(true);
+                    Console.ForegroundColor = LoginViewSettings.TextColor;
                 }
+                loginAttempt++;
                 numberOfAttempts--;
             } while (numberOfAttempts > 0);
-            Console.ForegroundColor = LoginViewSettings.InformationMessagesColor;
+            Console.ForegroundColor = LoginViewSettings.ErrorsMessagesColor;
             Console.WriteLine("Даун не смог залогиниться. Пошел нахер, черт..." +
                 "(нажми что-нибудь, скотина, чтобы я тебя больше не видел)");
             Console.ReadKey(true);

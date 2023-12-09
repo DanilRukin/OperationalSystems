@@ -30,13 +30,10 @@ namespace Messanger.Server.Data
         {
             if (_empty)
             {
-                DateTime startDate = DateTime.Today;
-                DateTime endDate = startDate.AddDays(1);
-
                 FirstUser = new User()
                 {
-                    FirstName = "Danil",
-                    LastName = "Rukin",
+                    FirstName = "Rukin",
+                    LastName = "Danil",
                     Patronymic = "Vitalievich",
                     Id = Guid.NewGuid(),
                     Login = "dvrukin",
@@ -44,8 +41,8 @@ namespace Messanger.Server.Data
                 };
                 SecondUser = new User()
                 {
-                    FirstName = "Elizaveta",
-                    LastName = "Farnieva",
+                    FirstName = "Farnieva",
+                    LastName = "Elizaveta",
                     Patronymic = "Olegovna",
                     Id = Guid.NewGuid(),
                     Login = "farnieva_eo",

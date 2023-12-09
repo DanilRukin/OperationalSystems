@@ -39,23 +39,19 @@ namespace Messanger.Client.Presentation.Views
                 {
                     case ConsoleKey _ when key == ConsoleKey.F1:
                         _presenter.SetView(_services.GetRequiredService<AddFriendView>());
-                        continueShow = true;
-                        break;
+                        return true;
                     case ConsoleKey _ when key == ConsoleKey.F2:
                         _presenter.SetView(_services.GetRequiredService<SelectInterlocutorView>());
-                        continueShow = true;
-                        break;
+                        return true;
                     case ConsoleKey _ when key == ConsoleKey.Escape:
-                        continueShow = false;
-                        break;
+                        return false;
                     default:
-                        continueShow = true;
                         break;
                 }
             } while (key != ConsoleKey.Escape);
             Console.ForegroundColor = textColor;
             Console.BackgroundColor = backgroundColor;
-            return continueShow;
+            return false;
         }
     }
 }

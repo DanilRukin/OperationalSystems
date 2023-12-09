@@ -4,6 +4,7 @@ using Messanger.Client.Presentation.ViewsSettings;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using System.Reflection.Metadata.Ecma335;
 
 namespace Messanger.Client
 {
@@ -24,7 +25,8 @@ namespace Messanger.Client
             .AddSingleton<MainView>()
             .AddSingleton<SelectInterlocutorView>()
             .AddSingleton<AddFriendView>()
-            .AddTransient<ChatView>();
+            .AddSingleton<ChatView>()
+            .AddSingleton<Presenter>();
 
         static async Task Main(string[] args)
         {
@@ -32,7 +34,8 @@ namespace Messanger.Client
             initializer.InitFromConfiguration(Configuration);
 
             await Host.StartAsync();
-            Presenter presenter = new Presenter(Host.Services.GetRequiredService<LoginView>());
+            Presenter presenter = Host.Services.GetRequiredService<Presenter>();
+            presenter.SetView(Host.Services.GetRequiredService<LoginView>());
             presenter.Show();
             await Host.StopAsync();
         }

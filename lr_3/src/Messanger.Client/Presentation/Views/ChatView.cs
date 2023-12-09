@@ -79,13 +79,15 @@ namespace Messanger.Client.Presentation.Views
                     }
                     var fetchResponse = client.FetchMessages(new FetchMessageRequest()
                     {
-                        RecieverId = Cash.UserId.ToString(),
-                        SenderId = Cash.CurrentInterlocutor.ToString() 
+                        RecieverId = Cash.CurrentInterlocutor.ToString(), // отправителем в данном случае должен быть текущий собеседник
+                        SenderId = Cash.UserId.ToString() // получателем - текущий пользователь
                     });
+                    Console.ForegroundColor = ChatViewSettings.MessagesFromFriendColor;
                     foreach (var fetchedMessage in fetchResponse.Messages)
                     {
-                        Console.WriteLine(fetchedMessage);
+                        Console.WriteLine("\t\t" + fetchedMessage);
                     }
+                    Console.ForegroundColor = ChatViewSettings.TextColor;
                 }
             }
         }

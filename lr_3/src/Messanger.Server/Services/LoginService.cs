@@ -16,10 +16,20 @@ namespace Messanger.Server.Services
 
         public async Task<User?> Login(string username, string password)
         {
-            var user = await _dataContext
+            try
+            {
+                var user = await _dataContext
                 .Users
                 .FirstOrDefaultAsync(u => u.Login == username && u.Password == password);
-            return user;
+                if (user == null)
+                    _logger.LogInformation($"Не удалось аутентифицировать пользователя {username}");
+                return user;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.Message);
+                return null;
+            }  
         }
     }
 }

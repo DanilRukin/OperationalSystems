@@ -49,6 +49,7 @@ namespace Messanger.Client.Presentation.Views
                         foreach (var friend in friends.Users)
                         {
                             Console.WriteLine($"{friendNumber}. {friend.FirstName} {friend.LastName} {friend.Patronymic}");
+                            friendNumber++;
                         }
                     }
                     Console.ForegroundColor = SelectInterlocutorViewSettings.UserInputColor;

@@ -43,13 +43,14 @@ namespace Messanger.Client.Presentation.Views
 
                     var users = client.GetAllUsers(empty);
                     var friends = client.GetFriendsList(new UserId() { Id = Cash.UserId.ToString() });
-                    var uniqueUsers = ExcludeFriends(users, friends);
+                    var uniqueUsers = ExcludeFriends(users, friends, Cash.UserId);
                     if (uniqueUsers != null)
                     {
                         int friendNumber = 1;
                         foreach (var friend in uniqueUsers)
                         {
                             Console.WriteLine($"{friendNumber}. {friend.FirstName} {friend.LastName} {friend.Patronymic}");
+                            friendNumber++;
                         }
                     }
                     Console.ForegroundColor = AddFriendViewSettings.UserInputColor;
@@ -67,8 +68,14 @@ namespace Messanger.Client.Presentation.Views
                         {
                             var selectedUser = uniqueUsers[number - 1];
                             Console.ForegroundColor = AddFriendViewSettings.TextColor;
+                            client.Subscribe(new SubscribeMessage()
+                            {
+                                Subscriber = new UserId() { Id = Cash.UserId.ToString() },
+                                Subcribed = new UserId() { Id = selectedUser.Id }
+                            });
                             Console.WriteLine($"Вы отправили заявку человеку: '{selectedUser.FirstName} {selectedUser.LastName} {selectedUser.Patronymic}'." +
                                 $" Для продолжения нажмите что-нибудь...");
+                            Console.ReadKey(true);
                             _presenter.SetView(_services.GetRequiredService<MainView>());
                             Console.ForegroundColor = textColor;
                             Console.BackgroundColor = backgroundColor;
@@ -79,9 +86,10 @@ namespace Messanger.Client.Presentation.Views
             }
         }
 
-        private RepeatedField<UserData> ExcludeFriends(ListUsers users, ListUsers friends)
+        private RepeatedField<UserData> ExcludeFriends(ListUsers users, ListUsers friends, Guid self)
         {
-            var uniqueUsers = users.Users.Except(friends.Users, new Comparer());
+            var uniqueUsers = users.Users.Except(friends.Users, new Comparer()).ToList();
+            uniqueUsers.Remove(uniqueUsers.First(u => u.Id == self.ToString()));
             var result = new RepeatedField<UserData>();
             foreach (var user in uniqueUsers)
             {

@@ -11,9 +11,8 @@ namespace Messanger.Client.Presentation
     {
         private IView _view;
 
-        public Presenter(IView view)
+        public Presenter()
         {
-            _view = view ?? throw new ArgumentNullException(nameof(view));
         }
 
         public void SetView(IView view)
@@ -21,6 +20,13 @@ namespace Messanger.Client.Presentation
             _view = view;
         }
 
-        public void Show() => _view.Show();
+        public void Show()
+        {
+            bool show = true;
+            while(show)
+            {
+                show = _view.Show();
+            }
+        }
     }
 }
