@@ -7,7 +7,7 @@ COPY . ./
 RUN dotnet restore
 
 
-RUN dotnet publish --no-restore -c Release -o /published
+RUN dotnet publish --no-restore -c Release -o published
 
 FROM mcr.microsoft.com/dotnet/aspnet:7.0 as runtime
 

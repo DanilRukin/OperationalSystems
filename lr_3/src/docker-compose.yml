@@ -2,8 +2,8 @@ version: '3'
 services:
   server:
     build:
-      context: .
-      dockerfile: /Messanger.Server/Dockerfile
+      context: ./Messanger.Server
+      dockerfile: Dockerfile
     image: messanger-server
     container_name: messanger-server
     logging:
@@ -26,9 +26,9 @@ services:
 
   client_1:
     build:
-      context: .
-      dockerfile: /Messanger.Client/Dockerfile
-    image: messanger-client
+      context: ./Messanger.Client
+      dockerfile: Dockerfile
+    image: messanger-client_1
     container_name: messanger-client_1
     logging:
       driver: "json-file"
@@ -50,9 +50,9 @@ services:
 
   client_2:
     build:
-      context: .
-      dockerfile: /Messanger.Client/Dockerfile
-    image: messanger-client
+      context: ./Messanger.Client
+      dockerfile: Dockerfile
+    image: messanger-client_2
     container_name: messanger-client_2
     logging:
       driver: "json-file"
