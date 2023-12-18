@@ -1,21 +1,20 @@
+FROM mcr.microsoft.com/dotnet/aspnet:7.0 as base
+WORKDIR /app
+
 FROM mcr.microsoft.com/dotnet/sdk:7.0 as build
-
-WORKDIR /app
-
+WORKDIR /src
 COPY . ./
-
 RUN dotnet restore
+COPY . .
+WORKDIR /src/
+RUN dotnet build Messanger.Server.csproj -c Release -o /app/build
 
+FROM build AS publish
+RUN dotnet publish Messanger.Server.csproj -c Release -o /app/publish
 
-RUN dotnet publish --no-restore -c Release -o published
-
-FROM mcr.microsoft.com/dotnet/aspnet:7.0 as runtime
-
-# Uncomment the line below if running with HTTPS
-# ENV ASPNETCORE_URLS=https://+:443
-
+FROM base AS final
 WORKDIR /app
+COPY --from=publish /app/publish .
 
-COPY --from=build /app/published .
-
+ENV DOTNET_EnableDiagnostics=0
 ENTRYPOINT [ "dotnet", "Messanger.Server.dll" ]

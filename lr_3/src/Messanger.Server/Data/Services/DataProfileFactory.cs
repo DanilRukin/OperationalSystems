@@ -26,6 +26,10 @@ namespace Messanger.Server.Data.Services
                     string migrationAssembly = profile[nameof(MySqlTestDataProfile.MigrationAssembly)];
                     return new MySqlTestDataProfile(profileName, connectionString, useSeedData,
                         migrateDatabase, createDatabase, migrationAssembly);
+                case string _ when profileName == "PostgresProfile_Messanger_test":
+                    string postgresMigrationAssembly = profile[nameof(PostgresTestDataProfile.MigrationAssembly)];
+                        return new PostgresTestDataProfile(profileName, connectionString, useSeedData,
+                        migrateDatabase, createDatabase, postgresMigrationAssembly);
                 default:
                     throw new InvalidOperationException($"Unable to create '{profileName}'" +
                     $" database profile");
